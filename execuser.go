@@ -1,6 +1,8 @@
 package execuser
 
 import (
+	"os"
+	"os/exec"
 	"os/user"
 	"strconv"
 	"syscall"
@@ -64,6 +66,14 @@ func convert(u *user.User) (*User, error) {
 	}
 
 	return &User{Uid: uint32(uid), Gid: uint32(gid), Username: u.Username, Name: u.Name, HomeDir: u.HomeDir}, nil
+}
+
+func (u *User) RunUser(cmd *exec.Cmd) {
+	cmd.SysProcAttr = u.SysProcAttr()
+	if cmd.Env == nil {
+		cmd.Env = os.Environ()
+	}
+	cmd.Env = append(cmd.Env, "USER="+u.Username, "HOME="+u.HomeDir)
 }
 
 func (u *User) SysProcAttr() *syscall.SysProcAttr {
