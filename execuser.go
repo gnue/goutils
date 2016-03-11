@@ -41,6 +41,17 @@ func LookupId(uid int) (*User, error) {
 	return convert(u)
 }
 
+func LookupPath(path string) (*User, error) {
+	var s syscall.Stat_t
+
+	err := syscall.Stat(path, &s)
+	if err != nil {
+		return nil, err
+	}
+
+	return LookupId(int(s.Uid))
+}
+
 func convert(u *user.User) (*User, error) {
 	uid, err := strconv.Atoi(u.Uid)
 	if err != nil {
