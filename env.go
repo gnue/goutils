@@ -2,13 +2,11 @@ package exenv
 
 import (
 	"bufio"
-	"errors"
 	"os"
-	"regexp"
 	"strings"
-)
 
-var reExport = regexp.MustCompile(`^export\s+`)
+	"github.com/gnue/exenv/parser"
+)
 
 type Env struct {
 	Data map[string]string
@@ -92,40 +90,11 @@ func (env *Env) read(fname string) error {
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
-		key, val, err := parse(scanner.Text())
-		if err != nil {
-			continue
-		}
-
-		env.Setenv(key, val)
+		p := parser.NewParser(scanner.Text())
+		p.Parse(func(key, val string) {
+			env.Setenv(key, val)
+		})
 	}
 
 	return nil
-}
-
-func parse(s string) (string, string, error) {
-	s = strings.SplitN(s, "#", 2)[0]
-	s = strings.Trim(s, " \t")
-	if s == "" {
-		return "", "", errors.New("skip line")
-	}
-
-	a := strings.SplitN(s, "=", 2)
-	key := strings.Trim(reExport.ReplaceAllString(a[0], ""), " \t")
-	val := unqoute(strings.Trim(a[1], " \t"))
-
-	return key, val, nil
-}
-
-func unqoute(s string) string {
-	if 0 < len(s) {
-		switch s[0] {
-		case '"':
-			return strings.Trim(s, `"`)
-		case '\'':
-			return strings.Trim(s, `'`)
-		}
-	}
-
-	return s
 }
