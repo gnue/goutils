@@ -11,6 +11,18 @@ var (
 	errInvalidQuote  = errors.New("invalid quote")
 )
 
+type multiError struct {
+	errs []error
+}
+
+func (e *multiError) Error() string {
+	if len(e.errs) == 1 {
+		return e.errs[0].Error()
+	}
+
+	return fmt.Sprintf("errors: %d", len(e.errs))
+}
+
 type expectError struct {
 	token rune
 }
