@@ -1,10 +1,12 @@
 package parser
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
+	"io"
 	"strings"
 	"unicode"
-	"unicode/utf8"
 )
 
 const (
@@ -74,7 +76,8 @@ func (i item) value() string {
 type stateFn func(*lexer) stateFn
 
 type lexer struct {
-	input string
+	input *bufio.Reader
+	buf   bytes.Buffer
 	start int
 	pos   int
 	width int
@@ -82,9 +85,9 @@ type lexer struct {
 	items chan item
 }
 
-func lex(input string) *lexer {
+func lex(r io.Reader) *lexer {
 	l := &lexer{
-		input: input,
+		input: bufio.NewReader(r),
 		items: make(chan item),
 	}
 	go l.run()
@@ -106,10 +109,11 @@ func (l *lexer) run() {
 func (l *lexer) emit(t rune) {
 	l.items <- item{t, l.text()}
 	l.start = l.pos
+	l.buf.Reset()
 }
 
 func (l *lexer) text() string {
-	return l.input[l.start:l.pos]
+	return l.buf.String()
 }
 
 func (l *lexer) nextItem() item {
@@ -117,21 +121,29 @@ func (l *lexer) nextItem() item {
 	return item
 }
 
-func (l *lexer) next() (r rune) {
-	if len(l.input) <= l.pos {
+func (l *lexer) next() rune {
+	r, size, err := l.input.ReadRune()
+	if err == io.EOF {
 		l.width = 0
 		return eof
 	}
-	r, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
+	if err == nil {
+		l.buf.WriteRune(r)
+	}
+
+	l.width = size
 	l.pos += l.width
 	return r
 }
 
 func (l *lexer) ignore() {
 	l.start = l.pos
+	l.buf.Reset()
 }
 
 func (l *lexer) backup() {
+	l.input.UnreadRune()
+	l.buf.Truncate(l.buf.Len() - l.width)
 	l.pos -= l.width
 }
 

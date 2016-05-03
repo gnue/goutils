@@ -1,7 +1,6 @@
 package exenv
 
 import (
-	"bufio"
 	"os"
 	"strings"
 
@@ -88,13 +87,10 @@ func (env *Env) read(fname string) error {
 	}
 	defer f.Close()
 
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		p := parser.NewParser(scanner.Text())
-		p.Parse(func(key, val string) {
-			env.Setenv(key, val)
-		})
-	}
+	p := parser.NewParser(f)
+	p.Parse(func(key, val string) {
+		env.Setenv(key, val)
+	})
 
 	return nil
 }

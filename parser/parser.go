@@ -1,6 +1,8 @@
 package parser
 
-import ()
+import (
+	"io"
+)
 
 type callbackFn func(key, val string)
 
@@ -12,8 +14,8 @@ type parser struct {
 	callback callbackFn
 }
 
-func NewParser(input string) *parser {
-	return &parser{lexer: lex(input)}
+func NewParser(r io.Reader) *parser {
+	return &parser{lexer: lex(r)}
 }
 
 func (p *parser) next() {
