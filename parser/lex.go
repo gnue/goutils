@@ -269,7 +269,8 @@ func lexString(l *lexer) stateFn {
 
 	for {
 		switch l.next() {
-		case eof:
+		case eof, '\n', '\r':
+			l.backup()
 			break
 		case qoute:
 			l.emit(itemString)
