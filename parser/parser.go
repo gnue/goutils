@@ -8,6 +8,7 @@ type parser struct {
 	lexer    *lexer
 	item     item
 	err      error
+	errs     []error
 	callback callbackFn
 }
 
@@ -56,17 +57,16 @@ func (p *parser) eof() bool {
 
 func (p *parser) Parse(callback callbackFn) error {
 	p.callback = callback
+
 	p.next()
-
-	for p.statement() || p.ignore() {
+	for p.statement() || p.ignore() || p.recover() {
 	}
 
-	err := p.err
-	if err == nil && !p.eof() {
-		err = &parseError{p.item.val}
+	if p.errs != nil && 0 < len(p.errs) {
+		return &multiError{p.errs}
 	}
 
-	return err
+	return nil
 }
 
 func (p *parser) ignore() bool {
@@ -77,6 +77,33 @@ func (p *parser) ignore() bool {
 	}
 
 	return ok
+}
+
+func (p *parser) error() bool {
+	err := p.err
+
+	if err == nil && !p.eof() {
+		err = &parseError{p.item.val}
+	}
+
+	if err != nil {
+		p.errs = append(p.errs, err)
+		p.err = nil
+	}
+
+	return err != nil
+}
+
+func (p *parser) recover() bool {
+	if p.error() {
+		p.next()
+
+		for !p.accept('\n') {
+			p.next()
+		}
+	}
+
+	return !p.eof()
 }
 
 func (p *parser) statement() bool {
