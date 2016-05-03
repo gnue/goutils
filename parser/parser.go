@@ -80,8 +80,18 @@ func (p *parser) ignore() bool {
 }
 
 func (p *parser) statement() bool {
-	p.accept(itemExport)
+	switch {
+	case p.accept(itemExport):
+		p.expression()
+		return true
+	case p.expression():
+		return true
+	}
 
+	return false
+}
+
+func (p *parser) expression() bool {
 	k := p.item
 	if p.key() {
 		if p.accept('=') || p.accept(':') {
