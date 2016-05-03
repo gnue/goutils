@@ -141,6 +141,27 @@ func (l *lexer) peek() rune {
 	return r
 }
 
+func (l *lexer) recover() stateFn {
+	for {
+		r := l.next()
+
+		switch r {
+		case eof:
+			l.emit(itemEOF)
+			return nil
+		case '\r':
+			l.acceptRune('\n')
+			l.emit('\n')
+			return lexStart
+		case '\n':
+			l.emit('\n')
+			return lexStart
+		default:
+			l.ignore()
+		}
+	}
+}
+
 func (l *lexer) accept(valid string) bool {
 	if 0 <= strings.IndexRune(valid, l.next()) {
 		return true
@@ -182,7 +203,7 @@ func (l *lexer) errorf(format string, args ...interface{}) stateFn {
 		itemError,
 		fmt.Sprintf(format, args...),
 	}
-	return nil
+	return l.recover()
 }
 
 // stateFn
