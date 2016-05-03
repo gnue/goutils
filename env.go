@@ -41,6 +41,14 @@ func (env *Env) Setenv(key string, val string) error {
 	return nil
 }
 
+func (env *Env) Defenv(key string, val string) error {
+	if _, ok := env.Data[key]; !ok {
+		env.Keys = append(env.Keys, key)
+		env.Data[key] = val
+	}
+	return nil
+}
+
 func (env *Env) Environ() []string {
 	d := env.Data
 	a := make([]string, 0, len(d))
