@@ -2,6 +2,8 @@ package parser
 
 import (
 	"io"
+
+	"github.com/gnue/merr"
 )
 
 type callbackFn func(key, val string)
@@ -64,11 +66,7 @@ func (p *parser) Parse(callback callbackFn) error {
 	for p.statement() || p.ignore() || p.recover() {
 	}
 
-	if p.errs != nil && 0 < len(p.errs) {
-		return &multiError{p.errs}
-	}
-
-	return nil
+	return merr.New(p.errs...)
 }
 
 func (p *parser) ignore() bool {
