@@ -25,6 +25,9 @@ func Expand(value interface{}, mapping func(string) string) {
 		numField := v.NumField()
 		for i := 0; i < numField; i++ {
 			f := v.Type().Field(i)
+			if f.PkgPath != "" && !f.Anonymous { // unexported
+				continue
+			}
 
 			var opts options
 
