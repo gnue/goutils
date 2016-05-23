@@ -4,8 +4,12 @@ import (
 	"fmt"
 )
 
-type MultiError struct {
-	Errors []error
+type Errors interface {
+	Errors() []error
+}
+
+type multiError struct {
+	errs []error
 }
 
 func New(errs ...error) error {
@@ -13,11 +17,11 @@ func New(errs ...error) error {
 		return nil
 	}
 
-	return &MultiError{errs}
+	return &multiError{errs}
 }
 
-func (e *MultiError) Error() string {
-	errs := e.Errors
+func (e *multiError) Error() string {
+	errs := e.errs
 	tail := "..."
 
 	switch len(errs) {
@@ -28,4 +32,8 @@ func (e *MultiError) Error() string {
 	}
 
 	return fmt.Sprint("errors: ", len(errs), errs[0], tail)
+}
+
+func (e *multiError) Errors() []error {
+	return e.errs
 }
