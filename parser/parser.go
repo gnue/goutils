@@ -3,7 +3,7 @@ package parser
 import (
 	"io"
 
-	"github.com/gnue/merr"
+	"github.com/gnue/goutils/merr"
 )
 
 type callbackFn func(key, val string)
