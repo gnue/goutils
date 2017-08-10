@@ -1,3 +1,4 @@
+// multiple error
 package merr
 
 import (
