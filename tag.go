@@ -1,3 +1,4 @@
+// parse struct tag
 package tag
 
 import (
