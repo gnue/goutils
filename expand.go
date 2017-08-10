@@ -4,7 +4,7 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/gnue/tag"
+	"github.com/gnue/goutils/tag"
 )
 
 const tagKey = "expandenv"
