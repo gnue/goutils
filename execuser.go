@@ -22,7 +22,7 @@ func Current() (*User, error) {
 		return nil, err
 	}
 
-	return convert(u)
+	return New(u)
 }
 
 func Lookup(username string) (*User, error) {
@@ -31,7 +31,7 @@ func Lookup(username string) (*User, error) {
 		return nil, err
 	}
 
-	return convert(u)
+	return New(u)
 }
 
 func LookupId(uid int) (*User, error) {
@@ -40,7 +40,7 @@ func LookupId(uid int) (*User, error) {
 		return nil, err
 	}
 
-	return convert(u)
+	return New(u)
 }
 
 func LookupPath(path string) (*User, error) {
@@ -54,7 +54,7 @@ func LookupPath(path string) (*User, error) {
 	return LookupId(int(s.Uid))
 }
 
-func convert(u *user.User) (*User, error) {
+func New(u *user.User) (*User, error) {
 	uid, err := strconv.Atoi(u.Uid)
 	if err != nil {
 		return nil, err
