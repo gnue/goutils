@@ -1,3 +1,4 @@
+// execute command with .rc
 package dotrc
 
 import (
