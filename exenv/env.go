@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gnue/exenv/parser"
+	"github.com/gnue/goutils/exenv/parser"
 )
 
 type Env struct {

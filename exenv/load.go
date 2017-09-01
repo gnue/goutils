@@ -3,7 +3,7 @@ package exenv
 import (
 	"os"
 
-	"github.com/gnue/exenv/parser"
+	"github.com/gnue/goutils/exenv/parser"
 )
 
 func Load(files ...string) error {

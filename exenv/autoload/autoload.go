@@ -1,7 +1,7 @@
 package autoload
 
 import (
-	"github.com/gnue/exenv"
+	"github.com/gnue/goutils/exenv"
 )
 
 func init() {
