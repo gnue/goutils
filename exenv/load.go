@@ -26,7 +26,7 @@ func read(fname string) error {
 
 	p := parser.NewParser(f)
 	p.Parse(func(key, val string) {
-		os.Setenv(key, val)
+		os.Setenv(key, os.ExpandEnv(val))
 	})
 
 	return nil
