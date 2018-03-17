@@ -97,7 +97,7 @@ func (env *Env) read(fname string) error {
 
 	p := parser.NewParser(f)
 	p.Parse(func(key, val string) {
-		env.Setenv(key, val)
+		env.Setenv(key, os.ExpandEnv(val))
 	})
 
 	return nil
